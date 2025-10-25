@@ -23,4 +23,4 @@ jobs:
         python -m pip install --upgrade pip
 
     - name: Run unit tests
-      run: python -m unittest test_app.py
+      run: python -m unittest test_payments.py
