@@ -31,12 +31,14 @@ async def register_payment(
 async def update_payment(
     payment_id: str,
     amount: float = Query(...),
-    payment_metho: str = Query(...),
+    payment_method: str = Query(...),
 ):
     try:
         data = load_payment(payment_id=payment_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f'Error al cargar el pago para actualizarlo {e}.')
+    data[AMOUNT] = amount
+    data[PAYMENT_METHOD] = payment_method
     save_payment_data(payment_id=payment_id, data=data)
     return {'payment_id' : payment_id, 'data': data}
 
@@ -59,7 +61,7 @@ async def pay(payment_id: str):
         raise HTTPException(status_code=400, detail=f'Error al procesar el pago {e}')
 
 @app.post('/payments/{payment_id}/revert')
-async def pay(payment_id: str):
+async def revert(payment_id: str):
     try:
         data = load_payment(payment_id=payment_id)
         ctx = PaymentContext(
