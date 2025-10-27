@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from main import app
 import json, os, tempfile, shutil
-import payment_validator as val
+import src.validators as val
 
 client = TestClient(app)
 
