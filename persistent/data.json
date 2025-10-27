@@ -1,0 +1,12 @@
+{
+    "as": {
+        "amount": 10.0,
+        "payment_method": "as",
+        "status": "REGISTRADO"
+    },
+    "abc": {
+        "amount": 2000.0,
+        "payment_method": "paypal",
+        "status": "REGISTRADO"
+    }
+}

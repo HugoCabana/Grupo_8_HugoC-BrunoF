@@ -1,12 +1,12 @@
 # ==============================
 # Contexto del pago
 # ==============================
-from payment_validator import (
-    get_validator, save_payment_data,
+from src.base import (
+    save_payment_data,
     STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO,
     AMOUNT, PAYMENT_METHOD, STATUS
 )
-from state_pattern import RegisteredState, PaidState, FailedState
+from src.states import RegisteredState, PaidState, FailedState
 
 class PaymentContext:
     def __init__(self, payment_id, amount, payment_method, status):
