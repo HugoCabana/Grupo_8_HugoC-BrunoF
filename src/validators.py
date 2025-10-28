@@ -1,12 +1,7 @@
 import json
 import os
 
-DATA_PATH = "data.json"
-
-STATUS = "status"
-AMOUNT = "amount"
-PAYMENT_METHOD = "payment_method"
-STATUS_REGISTRADO = "REGISTRADO"
+from src.base import DATA_PATH, STATUS, AMOUNT, PAYMENT_METHOD, STATUS_REGISTRADO
 
 # -------------------------------
 # Persistencia

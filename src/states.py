@@ -4,7 +4,7 @@
 # =============================
 from src.base import STATUS_FALLIDO, STATUS_PAGADO, STATUS_REGISTRADO
 from src.validators import (
-    get_validator, save_payment_data,
+    get_validator
 )
 
 class PaymentState:

@@ -3,7 +3,6 @@
 # ==============================
 from src.base import (
     save_payment_data,
-    STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO,
     AMOUNT, PAYMENT_METHOD, STATUS
 )
 from src.states import RegisteredState, PaidState, FailedState
