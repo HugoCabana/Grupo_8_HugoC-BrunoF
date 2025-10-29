@@ -10,10 +10,7 @@ STATUS_REGISTRADO = "REGISTRADO"
 STATUS_PAGADO = "PAGADO" 
 STATUS_FALLIDO = "FALLIDO" 
  
-DATA_PATH = "./persistent/data.json" 
- 
-app = FastAPI() 
- 
+DATA_PATH = "./persistent/data.json"  
  
 def load_all_payments(): 
     with open(DATA_PATH, "r") as f: 
@@ -46,7 +43,9 @@ def save_payment(payment_id, amount, payment_method, status):
     } 
     save_payment_data(payment_id, data) 
 
-
+def payment_exists(payment_id) -> bool:
+    data = load_all_payments()
+    return str(payment_id) in data
 '''
 # Ejemplo de uso: 
 # Actualizando el status de un pago: 
