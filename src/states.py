@@ -2,10 +2,9 @@
 # ==============================
 # Patrón State
 # =============================
-from payment_validator import (
-    get_validator, save_payment_data,
-    STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO,
-    AMOUNT, PAYMENT_METHOD, STATUS
+from src.base import STATUS_FALLIDO, STATUS_PAGADO, STATUS_REGISTRADO
+from src.validators import (
+    get_validator
 )
 
 class PaymentState:
@@ -57,5 +56,5 @@ class FailedState(PaymentState):
         context.set_state(RegisteredState())
         context._persist()
 
-# evitar circular import
-from payment_context import PaymentContext  # noqa: E402
+# # evitar circular import
+# from payment_context import PaymentContext  # noqa: E402

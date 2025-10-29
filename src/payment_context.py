@@ -1,12 +1,11 @@
 # ==============================
 # Contexto del pago
 # ==============================
-from payment_validator import (
-    get_validator, save_payment_data,
-    STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO,
-    AMOUNT, PAYMENT_METHOD, STATUS
+from src.base import (
+    save_payment_data,
+    AMOUNT, PAYMENT_METHOD, STATUS, STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO
 )
-from state_pattern import RegisteredState, PaidState, FailedState
+from src.states import RegisteredState, PaidState, FailedState
 
 class PaymentContext:
     def __init__(self, payment_id, amount, payment_method, status):
@@ -17,11 +16,11 @@ class PaymentContext:
         self._state = self._get_state(status)
 
     def _get_state(self, status):
-        if status == "REGISTRADO":
+        if status == STATUS_REGISTRADO:
             return RegisteredState()
-        elif status == "PAGADO":
+        elif status == STATUS_PAGADO:
             return PaidState()
-        elif status == "FALLIDO":
+        elif status == STATUS_FALLIDO:
             return FailedState()
         else:
             raise ValueError("Estado desconocido")
