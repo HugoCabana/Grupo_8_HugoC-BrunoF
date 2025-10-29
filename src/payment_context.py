@@ -3,7 +3,7 @@
 # ==============================
 from src.base import (
     save_payment_data,
-    AMOUNT, PAYMENT_METHOD, STATUS
+    AMOUNT, PAYMENT_METHOD, STATUS, STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO
 )
 from src.states import RegisteredState, PaidState, FailedState
 
@@ -16,11 +16,11 @@ class PaymentContext:
         self._state = self._get_state(status)
 
     def _get_state(self, status):
-        if status == "REGISTRADO":
+        if status == STATUS_REGISTRADO:
             return RegisteredState()
-        elif status == "PAGADO":
+        elif status == STATUS_PAGADO:
             return PaidState()
-        elif status == "FALLIDO":
+        elif status == STATUS_FALLIDO:
             return FailedState()
         else:
             raise ValueError("Estado desconocido")
