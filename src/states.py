@@ -38,15 +38,16 @@ class PaidState(PaymentState):
     def revert(self, context): raise Exception("No se puede revertir un pago PAGADO")
 
 class FailedState(PaymentState):
-    def pay(self, context):
-        validator = get_validator(context.payment_method)
-        valid = validator.validate(context.payment_id, context.amount, context.payment_method)
-        if valid:
-            context.status = STATUS_PAGADO
-            context.set_state(PaidState())
-        else:
-            context.status = STATUS_FALLIDO
-        context._persist()
+    def pay(self, context): raise Exception("No se puede pagar un pago FALLIDO. Revertir a REGISTRADO antes")
+    # def pay(self, context):
+    #     validator = get_validator(context.payment_method)
+    #     valid = validator.validate(context.payment_id, context.amount, context.payment_method)
+    #     if valid:
+    #         context.status = STATUS_PAGADO
+    #         context.set_state(PaidState())
+    #     else:
+    #         context.status = STATUS_FALLIDO
+    #     context._persist()
 
     def update(self, context, amount, method):
         raise Exception("No se puede actualizar un pago FALLIDO")

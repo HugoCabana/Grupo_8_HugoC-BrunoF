@@ -37,6 +37,16 @@
     "f": {
         "amount": 9000.0,
         "payment_method": "tarjeta",
-        "status": "REGISTRADO"
+        "status": "PAGADO"
+    },
+    "g": {
+        "amount": 6000.0,
+        "payment_method": "tarjeta",
+        "status": "PAGADO"
+    },
+    "h": {
+        "amount": 6000.0,
+        "payment_method": "tarjeta",
+        "status": "PAGADO"
     }
 }
