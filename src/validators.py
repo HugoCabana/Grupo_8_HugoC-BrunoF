@@ -1,9 +1,8 @@
+""" Validadores de métodos de pago """
+
 from src.base import load_all_payments
 from src.base import STATUS, PAYMENT_METHOD, STATUS_REGISTRADO
 
-# -------------------------------
-# Validadores de métodos de pago
-# -------------------------------
 class PaymentValidator:
     def validate(self, payment_id, amount, payment_method):
         raise NotImplementedError

@@ -1,7 +1,6 @@
 
-# ==============================
-# Patrón State
-# =============================
+""" Patrón State """
+
 from src.base import STATUS_FALLIDO, STATUS_PAGADO, STATUS_REGISTRADO
 from src.validators import (
     get_validator
@@ -39,15 +38,6 @@ class PaidState(PaymentState):
 
 class FailedState(PaymentState):
     def pay(self, context): raise Exception("No se puede pagar un pago FALLIDO. Revertir a REGISTRADO antes")
-    # def pay(self, context):
-    #     validator = get_validator(context.payment_method)
-    #     valid = validator.validate(context.payment_id, context.amount, context.payment_method)
-    #     if valid:
-    #         context.status = STATUS_PAGADO
-    #         context.set_state(PaidState())
-    #     else:
-    #         context.status = STATUS_FALLIDO
-    #     context._persist()
 
     def update(self, context, amount, method):
         raise Exception("No se puede actualizar un pago FALLIDO")
@@ -56,6 +46,3 @@ class FailedState(PaymentState):
         context.status = STATUS_REGISTRADO
         context.set_state(RegisteredState())
         context._persist()
-
-# # evitar circular import
-# from payment_context import PaymentContext  # noqa: E402
