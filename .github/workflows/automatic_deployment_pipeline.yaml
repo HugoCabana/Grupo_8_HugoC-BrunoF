@@ -5,7 +5,8 @@
 #   Este workflow se ejecuta automáticamente cuando se hace
 #   push a la rama 'production'. Su función es crear
 #   automáticamente un nuevo tag semántico (v*.*.*) y el
-#   Release correspondiente en GitHub.
+#   Release correspondiente en GitHub. Luego dispara el
+#   despliegue en Render mediante un Deploy Hook.
 #
 # ---------------------------------------------------------
 # Lógica de versionado:
@@ -18,22 +19,17 @@
 #       • [bump:patch] o sin bump → incrementa patch (vM.m.(p+1))
 #   - Si el mensaje no contiene ningún marcador [bump:...],
 #     aplica por defecto un incremento de patch.
+#   - Si el tag calculado ya existe, incrementa PATCH hasta
+#     encontrar un tag libre.
 #   - Finalmente crea el Release con el nuevo tag y asocia
 #     el commit actual ('commitish') como punto de referencia.
 #
 # ---------------------------------------------------------
-# Posibles causas de error:
-#   • Si el último Release fue creado desde otra rama (por
-#     ejemplo 'main') y 'production' no estaba actualizada
-#     con esos commits, el workflow podría no encontrar el
-#     último tag (porque git describe solo ve tags alcanzables
-#     desde el commit actual).
-#   • En ese caso, intentará volver a crear el mismo tag
-#     anterior (p. ej. v0.0.1) y fallará con:
-#       "Validation Failed: already_exists"
-#   • Solución: asegurarse de que la rama 'production' esté
-#     actualizada con 'main' antes de hacer push (por ejemplo,
-#     ejecutar 'git pull origin main').
+# Render (Deploy Hook):
+#   - Requiere el secreto RENDER_DEPLOY_HOOK_URL configurado
+#     en GitHub Actions.
+#   - Si el secreto no existe (o está vacío), el workflow
+#     falla antes de crear el Release.
 #
 # ---------------------------------------------------------
 # Ejemplos de uso:
@@ -53,7 +49,6 @@
 #   • Requiere permisos 'contents: write' para poder crear
 #     el tag y el Release mediante la API.
 # =========================================================
-
 
 name: CD/Release Pipeline
 
@@ -79,13 +74,16 @@ jobs:
         run: |
           set -e
           git fetch --tags --force
-          LAST_TAG=$(git describe --tags --abbrev=0 --match "v[0-9]*.[0-9]*.[0-9]*" 2>/dev/null || echo "v0.0.0")
+
+          # Último tag semántico por orden de versión (no depende de alcanzabilidad)
+          LAST_TAG=$(git tag --list "v[0-9]*.[0-9]*.[0-9]*" --sort=-v:refname | head -n 1)
+          if [ -z "$LAST_TAG" ]; then LAST_TAG="v0.0.0"; fi
 
           MAJOR=${LAST_TAG#v}; MAJOR=${MAJOR%%.*}
           REST=${LAST_TAG#v$MAJOR.}; MINOR=${REST%%.*}
           PATCH=${LAST_TAG##*.}
 
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          COMMIT_MSG="${{ github.event.head_commit.message || '' }}"
           BUMP="patch"
           if echo "$COMMIT_MSG" | grep -qi '\[bump:major\]'; then
             BUMP="major"
@@ -102,7 +100,24 @@ jobs:
           fi
 
           NEXT_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+
+          # Evitar colisiones: si el tag ya existe, seguir incrementando PATCH
+          while git rev-parse -q --verify "refs/tags/$NEXT_TAG" >/dev/null; do
+            PATCH=$((PATCH+1))
+            NEXT_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          done
+
           echo "tag=$NEXT_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Validar Secrets de Render (Deploy Hook)
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          set -e
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Falta configurar el secreto RENDER_DEPLOY_HOOK_URL en GitHub."
+            exit 1
+          fi
 
       - name: Crear release
         uses: actions/create-release@v1
@@ -117,3 +132,10 @@ jobs:
             Commit: ${{ github.sha }}
           draft: false
           prerelease: false
+
+      - name: Disparar despliegue en Render (Deploy Hook)
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          set -e
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
