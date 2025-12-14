@@ -282,3 +282,40 @@ Actualmente el CI corre de forma estable y, tras ampliar la suite de tests, la v
 
 
 ## 7. Despliegue continuo (CD)
+
+El proyecto cuenta con un flujo de Despliegue Continuo (CD) en GitHub Actions para crear releases y desplegar automáticamente la API en Render.
+
+### 7.1. Cuándo se ejecuta
+
+El CD se ejecuta cuando:
+- se hace `push` a la rama `production`,
+- se ejecuta manualmente desde la pestaña “Actions” (ejecución manual).
+
+### 7.2. Qué hace
+
+En cada ejecución:
+1) calcula el próximo tag semántico (vMAJOR.MINOR.PATCH) a partir de los tags existentes,
+2) crea un Release en GitHub con ese tag,
+3) dispara el despliegue en Render mediante un Deploy Hook (HTTP POST).
+
+### 7.3. Versionado por mensaje de commit
+
+El incremento de versión se controla con marcadores en el mensaje del commit:
+
+- `[bump:major]` incrementa MAJOR (reinicia MINOR y PATCH a 0).
+- `[bump:minor]` incrementa MINOR (reinicia PATCH a 0).
+- `[bump:patch]` o sin marcador incrementa PATCH.
+
+Si el tag calculado ya existe, el workflow incrementa PATCH hasta encontrar un tag libre.
+
+### 7.4. Configuración requerida (Render)
+
+- Render debe tener Auto-Deploy desactivado.
+- GitHub debe tener configurado el secreto `RENDER_DEPLOY_HOOK_URL` (Deploy Hook de Render).
+- Si el secreto no existe (o está vacío), el workflow falla antes de crear el Release.
+
+### 7.5. Dónde se ve el resultado
+
+- En GitHub: pestaña “Actions” (ejecución del workflow y estado).
+- En GitHub: sección “Releases” (tag y release creados).
+- En Render: historial de despliegues del servicio.
