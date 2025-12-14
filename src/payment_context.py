@@ -1,6 +1,5 @@
-# ==============================
-# Contexto del pago
-# ==============================
+""" Contexto del pago """
+
 from src.base import (
     save_payment_data,
     AMOUNT, PAYMENT_METHOD, STATUS, STATUS_REGISTRADO, STATUS_PAGADO, STATUS_FALLIDO
